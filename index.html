@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeWit | The Codeathon</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
+    <script src="app.js" defer></script>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container nav-container">
+        <a href="#home" class="nav-logo" aria-label="Home">
+            <img src="logo/CodeWit.png" alt="CodeWit" class="nav-logo-img">
+        </a>
+        <ul class="nav-links">
+            <li><a href="#details">Details</a></li>
+            <li><a href="#agenda">Agenda</a></li>
+            <li><a href="#prizes">Prizes</a></li>
+            <li><a href="#" class="nav-btn">Register</a></li>
+        </ul>
+    </div>
+</nav>
+
+<header role="banner" aria-label="CodeWit hero" id="home">
+    <canvas id="binaryCanvas" class="binary-canvas" aria-hidden="true"></canvas>
+    <div class="container hero-content">
+        <img src="logo/CodeWit.png" alt="CodeWit" class="logo" id="heroLogo">
+        <h1 class="visually-hidden">CodeWit</h1>
+        <p class="subtitle">&lt;HELLO WORLD /&gt;</p>
+        <p class="subtitle" style="margin-top: 1rem; color: #fff;">JANUARY 31ST // 9:00 AM – 5:00 PM</p>
+
+        <div class="partners">
+            <p>HOSTED BY</p>
+            <p><strong>Wentworth Student Government</strong></p>
+            <p>&times;</p>
+            <p><strong>Wentworth School of Computing and Data Science</strong></p>
+        </div>
+
+        <a href="#" class="btn">Register Now</a>
+        <div class="hero-hint" id="heroHint">Click to energize ⚡</div>
+    </div>
+</header>
+
+<section class="info-section" id="details">
+    <div class="container">
+        <div class="grid">
+            <!-- Location Card -->
+            <div class="card reveal">
+                <h3>// LOCATION</h3>
+                <p>Join us live at the heart of campus.</p>
+                <span class="highlight">Watson Auditorium</span>
+                <p style="margin-top:10px; font-size: 0.8rem; color: #666;">WENTWORTH INSTITUTE OF TECHNOLOGY</p>
+            </div>
+
+            <!-- Time Card -->
+            <div class="card reveal">
+                <h3>// TIME</h3>
+                <p>Doors open early. Hacking starts sharp.</p>
+                <span class="highlight">09:00 AM – 05:00 PM</span>
+                <p id="countdown" style="margin-top:10px; color: var(--accent-yellow); font-family: var(--font-code);">
+                    <!-- Countdown injected here -->
+                </p>
+            </div>
+
+            <!-- About Card -->
+            <div class="card reveal">
+                <h3>// THE EVENT</h3>
+                <p>Build. Break. Innovate.</p>
+                <p style="margin-top: 10px;">Compete for prizes and glory in this year's ultimate coding challenge.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="info-section" id="agenda">
+    <div class="container">
+        <div class="grid">
+            <!-- Agenda Card -->
+            <div class="card reveal">
+                <h3>// AGENDA (TBD)</h3>
+                <ul class="timeline">
+                    <li><strong>9:00</strong> Registration, breakfast/snacks, setup</li>
+                    <li><strong>9:30 – 10:00</strong> Welcome speech</li>
+                    <li><strong>10:00 – 12:00</strong> Time to program! / mentoring support</li>
+                    <li><strong>12:00 – 1:00</strong> Lunch</li>
+                    <li><strong>1:00 – 4:00</strong> Continue programming</li>
+                    <li><strong>4:00 – 5:00</strong> Closing + awards</li>
+                </ul>
+            </div>
+
+            <!-- Logistics / Support Card -->
+            <div class="card reveal">
+                <h3>// LOGISTICS & SUPPORT</h3>
+                <p>We’ll distribute ready-to-go Chromebook sets (Chromebook + charger + HackerRank account).</p>
+                <p style="margin-top: 0.5rem;">Logan from DTS – IT will be onsite from <span class="highlight">9:00 AM – 12:00 PM</span> to assist with technical issues and troubleshooting.</p>
+                <p style="margin-top: 0.5rem;">Professors will be available to connect and advise participants.</p>
+            </div>
+
+            <!-- Merch Card -->
+            <div class="card reveal">
+                <h3>// MERCH</h3>
+                <p>We’ll collect T‑shirt sizes. We’re also exploring collaborating with the web team to distribute mini Ruggles.</p>
+                <p style="margin-top: 0.5rem;">Got thoughts on merch? <a class="btn-link" href="#" aria-label="Send merch feedback">Give merch feedback</a></p>
+            </div>
+
+            <!-- Prizes Card -->
+            <div class="card reveal" id="prizes">
+                <h3>// PRIZES</h3>
+                <p>Be an early action participant and help decide the final prizes.</p>
+                <p style="margin-top: 0.5rem;">We’ll collect responses up until <span class="highlight">January 5th/10th</span>.</p>
+                <a href="#" class="btn" aria-label="Vote on prizes">Vote on Prizes</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p class="footer-text">Organized by Wentworth Student Government & School of Computing</p>
+        <p class="copyright">&copy; 2025 CodeWit. All systems go.</p>
+    </div>
+</footer>
+
+</body>
+</html>
