@@ -308,3 +308,300 @@
     card.addEventListener('mouseleave', onLeave);
   });
 })();
+
+
+// -----------------------------
+// Team Network (SVG)
+// -----------------------------
+(function teamNetwork() {
+  const container = document.getElementById('teamNetwork');
+  if (!container) return;
+
+  const NS = 'http://www.w3.org/2000/svg';
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let members;
+  try {
+    members = JSON.parse(container.getAttribute('data-members') || '[]');
+  } catch (e) {
+    members = [];
+  }
+  if (!members.length) return;
+
+  // Decode any HTML entities that may be present in data-members
+  const decodeHTML = (str) => {
+    const ta = document.createElement('textarea');
+    ta.innerHTML = str;
+    return ta.value;
+  };
+  members = members.map(m => ({
+    name: decodeHTML(m.name || ''),
+    role: decodeHTML(m.role || '')
+  }));
+
+  function create(tag, attrs, parent) {
+    const el = document.createElementNS(NS, tag);
+    if (attrs) Object.keys(attrs).forEach(k => el.setAttribute(k, attrs[k]));
+    if (parent) parent.appendChild(el);
+    return el;
+  }
+
+  const svg = create('svg', { preserveAspectRatio: 'xMidYMid meet' }, null);
+  const linksGroup = create('g', { class: 'links' }, svg);
+  const hubGroup = create('g', { class: 'hub' }, svg);
+  const nodesGroup = create('g', { class: 'nodes' }, svg);
+  container.appendChild(svg);
+
+  let width = 0, height = 0, cx = 0, cy = 0, radius = 0;
+  let baseRotation = -Math.PI / 2; // start at top
+  const step = (2 * Math.PI) / members.length;
+  const nodeAngles = members.map((_, i) => i * step);
+
+  // Hub
+  const hubCircle = create('circle', {}, hubGroup);
+  const hubText = create('text', { 'text-anchor': 'middle', 'dominant-baseline': 'middle' }, hubGroup);
+  hubText.textContent = 'TEAM';
+  hubGroup.setAttribute('tabindex', '0');
+  hubGroup.setAttribute('role', 'img');
+  hubGroup.setAttribute('aria-label', 'Planning team hub');
+
+  const nodeGroups = [];
+  const hubLinks = [];
+
+  // Nodes + links
+  members.forEach((m, idx) => {
+    const g = create('g', { class: 'team-node' }, nodesGroup);
+    g.setAttribute('tabindex', '0');
+    g.setAttribute('role', 'button');
+    g.setAttribute('aria-label', `${m.name} — ${m.role}`);
+
+    const c = create('circle', { r: '18' }, g);
+
+    const label = create('text', { 'text-anchor': 'middle', 'dominant-baseline': 'middle' }, g);
+    const t1 = create('tspan', { x: '0', dy: '-0.2em' }, label); t1.textContent = m.name;
+    const t2 = create('tspan', { x: '0', dy: '1.3em' }, label); t2.textContent = m.role;
+
+    const link = create('line', { class: 'team-link' }, linksGroup);
+
+    nodeGroups.push(g);
+    hubLinks.push(link);
+
+    function setHighlight(on) {
+      if (on) {
+        g.classList.add('highlight');
+        link.classList.add('highlight');
+      } else {
+        g.classList.remove('highlight');
+        link.classList.remove('highlight');
+      }
+    }
+
+    g.addEventListener('mouseenter', () => setHighlight(true));
+    g.addEventListener('mouseleave', () => setHighlight(false));
+    g.addEventListener('focus', () => setHighlight(true));
+    g.addEventListener('blur', () => setHighlight(false));
+    g.addEventListener('click', () => showTooltip(idx));
+    g.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Enter' || ev.key === ' ') {
+        ev.preventDefault();
+        showTooltip(idx);
+      }
+    });
+  });
+
+  // Tooltip logic
+  const tooltipEl = document.createElement('div');
+  tooltipEl.className = 'team-tooltip';
+  tooltipEl.setAttribute('role', 'status');
+  tooltipEl.setAttribute('aria-hidden', 'true');
+  tooltipEl.innerHTML = '<div class="tt-name"></div><div class="tt-role"></div>';
+  container.appendChild(tooltipEl);
+
+  let selectedIndex = -1;
+
+  function renderTooltip() {
+    if (selectedIndex < 0) return;
+    const m = members[selectedIndex];
+    tooltipEl.querySelector('.tt-name').textContent = m.name;
+    tooltipEl.querySelector('.tt-role').textContent = m.role;
+  }
+
+  function positionTooltip() {
+    if (selectedIndex < 0) return;
+    const a = baseRotation + nodeAngles[selectedIndex];
+    const nx = cx + radius * Math.cos(a);
+    const ny = cy + radius * Math.sin(a);
+    tooltipEl.style.left = nx + 'px';
+    tooltipEl.style.top = ny + 'px';
+  }
+
+  function showTooltip(idx) {
+    selectedIndex = idx;
+    renderTooltip();
+    positionTooltip();
+    tooltipEl.classList.add('visible');
+    tooltipEl.setAttribute('aria-hidden', 'false');
+  }
+
+  function hideTooltip() {
+    selectedIndex = -1;
+    tooltipEl.classList.remove('visible');
+    tooltipEl.setAttribute('aria-hidden', 'true');
+  }
+
+  // Hide on background click (but not when clicking a node)
+  container.addEventListener('click', (e) => {
+    if (e.target.closest('.team-node') || e.target.closest('.team-tooltip')) return;
+    hideTooltip();
+  });
+
+  // Hide on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') hideTooltip();
+  });
+
+  // Also hide when focusing hub
+  hubGroup.addEventListener('click', hideTooltip);
+  hubGroup.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); hideTooltip(); } });
+
+  function resize() {
+    const rect = container.getBoundingClientRect();
+    width = Math.max(320, Math.floor(rect.width));
+    height = Math.max(260, Math.floor(rect.height));
+    cx = width / 2; cy = height / 2;
+    radius = Math.min(width, height) * 0.33;
+
+    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+
+    const hubR = Math.max(18, Math.min(24, Math.floor(Math.min(width, height) * 0.04)));
+    hubCircle.setAttribute('cx', cx);
+    hubCircle.setAttribute('cy', cy);
+    hubCircle.setAttribute('r', hubR.toString());
+    hubText.setAttribute('x', cx);
+    hubText.setAttribute('y', cy);
+
+    updatePositions(0);
+  }
+
+  function updatePositions(dt) {
+    nodeGroups.forEach((g, i) => {
+      const a = baseRotation + nodeAngles[i];
+      const nx = cx + radius * Math.cos(a);
+      const ny = cy + radius * Math.sin(a);
+      g.setAttribute('transform', `translate(${nx},${ny})`);
+
+      const link = hubLinks[i];
+      link.setAttribute('x1', cx);
+      link.setAttribute('y1', cy);
+      link.setAttribute('x2', nx);
+      link.setAttribute('y2', ny);
+    });
+  }
+
+  let lastTs = 0;
+  function animate(ts) {
+    const dt = lastTs ? Math.min(0.05, (ts - lastTs) / 1000) : 0;
+    lastTs = ts;
+    if (!prefersReduced) {
+      baseRotation += dt * 0.15; // slow orbit
+      updatePositions(dt);
+    }
+    if (typeof positionTooltip === 'function') positionTooltip();
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', resize);
+  // Initial
+  resize();
+  requestAnimationFrame(animate);
+})();
+
+
+// -----------------------------
+// Subtle hover scramble effect for names
+// -----------------------------
+(function nameScramble() {
+  const els = document.querySelectorAll('.glitch-hover');
+  if (!els.length) return;
+  const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+  els.forEach(el => {
+    const original = el.textContent;
+    let raf = null;
+
+    function scramble() {
+      if (prefersReduced) return;
+      const duration = 520;
+      const start = performance.now();
+      cancelAnimationFrame(raf);
+
+      function frame(ts) {
+        const p = Math.min(1, (ts - start) / duration);
+        const reveal = Math.floor(original.length * p);
+        const out = original.split('').map((ch, idx) => {
+          if (idx < reveal || /\s/.test(ch)) return ch;
+          return letters[Math.floor(Math.random() * letters.length)];
+        }).join('');
+        el.textContent = out;
+        if (p < 1) {
+          raf = requestAnimationFrame(frame);
+        } else {
+          el.textContent = original;
+        }
+      }
+      raf = requestAnimationFrame(frame);
+    }
+
+    el.addEventListener('mouseenter', scramble);
+    el.addEventListener('focus', scramble);
+  });
+})();
+
+
+// -----------------------------
+// Operator cards: expand/collapse on click/keyboard
+// -----------------------------
+(function operatorCardsExpand() {
+  const cards = document.querySelectorAll('.operator-card[aria-controls]');
+  if (!cards.length) return;
+
+  function getRegion(card) {
+    const id = card.getAttribute('aria-controls');
+    return id ? document.getElementById(id) : null;
+    }
+
+  function setExpanded(card, expand) {
+    const region = getRegion(card);
+    const on = !!expand;
+    card.setAttribute('aria-expanded', on ? 'true' : 'false');
+    card.classList.toggle('expanded', on);
+    if (region) region.setAttribute('aria-hidden', on ? 'false' : 'true');
+  }
+
+  function closeOthers(except) {
+    cards.forEach(c => { if (c !== except) setExpanded(c, false); });
+  }
+
+  // Initialize ARIA/state coherently
+  cards.forEach(card => setExpanded(card, card.getAttribute('aria-expanded') === 'true'));
+
+  cards.forEach(card => {
+    card.addEventListener('click', (e) => {
+      // Ignore interactive elements inside
+      if (e.target.closest('a, button')) return;
+      const expand = card.getAttribute('aria-expanded') !== 'true';
+      if (expand) closeOthers(card);
+      setExpanded(card, expand);
+    });
+
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const expand = card.getAttribute('aria-expanded') !== 'true';
+        if (expand) closeOthers(card);
+        setExpanded(card, expand);
+      }
+    });
+  });
+})();

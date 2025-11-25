@@ -515,3 +515,301 @@ a:focus-visible {
     .card:hover { transform: translateY(-7px) !important; }
     .card::after { display: none; }
 }
+
+
+/* Details grid override: make THE EVENT span full width above others on wide screens */
+@media (min-width: 900px) {
+  #details .grid {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-flow: dense;
+  }
+  #details .card.event-card {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    order: -1;
+  }
+}
+
+/* Agenda grid override: 2x2 layout on wider screens */
+@media (min-width: 900px) {
+  #agenda .grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+/* Team Network */
+#team .team-network-card { grid-column: 1 / -1; overflow: hidden; }
+
+.team-network {
+    position: relative;
+    width: 100%;
+    min-height: 520px;
+    height: min(70vh, 820px);
+    display: grid;
+    place-items: center;
+}
+
+.team-network svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.team-network .team-link {
+    stroke: rgba(240, 219, 79, 0.35);
+    stroke-width: 1.5;
+    transition: stroke 0.2s ease, stroke-width 0.2s ease, opacity 0.2s ease;
+}
+
+.team-network .team-link.highlight {
+    stroke: var(--accent-yellow);
+    stroke-width: 2.5;
+    opacity: 0.95;
+}
+
+.team-network .team-node circle {
+    fill: rgba(240, 219, 79, 0.06);
+    stroke: var(--accent-yellow);
+    stroke-width: 2;
+    transition: transform 0.2s ease, fill 0.2s ease, stroke-width 0.2s ease, opacity 0.2s ease;
+}
+
+.team-network .team-node text {
+    font-family: var(--font-code);
+    font-size: 12px;
+    fill: var(--text-primary);
+    opacity: 0.75;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.team-network .team-node.highlight circle {
+    stroke-width: 3;
+    fill: rgba(240, 219, 79, 0.12);
+}
+
+.team-network .team-node.highlight text {
+    opacity: 1;
+}
+
+.team-network .hub circle {
+    fill: rgba(240, 219, 79, 0.12);
+    stroke: var(--accent-yellow);
+    stroke-width: 2.5;
+}
+
+.team-network .hub text {
+    font-family: var(--font-code);
+    font-size: 12px;
+    fill: var(--text-primary);
+    opacity: 0.9;
+}
+
+.team-network .team-node:focus-visible circle,
+.team-network .hub:focus-visible circle {
+    outline: none;
+    stroke: #fff;
+}
+
+/* Tooltip for team node details */
+.team-tooltip {
+    position: absolute;
+    max-width: 280px;
+    padding: 0.8rem 1rem;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, -120%);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 2;
+}
+.team-tooltip.visible {
+    opacity: 1;
+    transform: translate(-50%, -130%);
+}
+.team-tooltip .tt-name { font-weight: 700; margin-bottom: 0.25rem; }
+.team-tooltip .tt-role { color: var(--text-secondary); font-family: var(--font-code); font-size: 0.85rem; }
+
+.team-fallback {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0 0 0;
+    color: var(--text-secondary);
+}
+
+.team-fallback li { margin: 0.25rem 0; }
+
+
+/* Team Operatives (Holographic Dossiers) */
+#team .team-ops-card { grid-column: 1 / -1; }
+
+.team-ops-card .team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.operator-card {
+  position: relative;
+  background: rgba(20,20,20,0.65);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 1.1rem;
+  overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.operator-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(240,219,79,0.35);
+  box-shadow: 0 10px 36px rgba(0,0,0,0.45), 0 0 0 1px rgba(240,219,79,0.12) inset;
+}
+
+/* subtle scanline overlay on hover */
+.operator-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.02),
+    rgba(255,255,255,0.02) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  transition: opacity 0.25s ease;
+}
+.operator-card:hover::after { opacity: 1; }
+
+.op-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+.op-id { color: var(--accent-yellow); }
+.op-status { font-weight: 700; }
+.op-status.online { color: #4ef0a3; text-shadow: 0 0 6px rgba(78,240,163,0.35); }
+
+.op-body {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.op-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(240,219,79,0.35);
+  background:
+    radial-gradient(40px 40px at 30% 30%, rgba(240,219,79,0.35), rgba(240,219,79,0.06) 60%, transparent 100%),
+    rgba(10,10,10,0.5);
+  box-shadow: inset 0 0 12px rgba(240,219,79,0.25);
+}
+.op-avatar span { color: var(--accent-yellow); font-weight: 800; }
+
+.op-info .op-name { font-weight: 800; font-size: 1.1rem; line-height: 1.2; }
+.op-info .op-role { color: var(--text-primary); opacity: 0.9; margin-top: 0.1rem; font-family: var(--font-code); }
+.op-info .op-subrole { color: var(--text-secondary); font-size: 0.9rem; }
+
+.op-footer { margin-top: 0.9rem; font-family: var(--font-code); font-size: 0.75rem; color: var(--text-secondary); opacity: 0.85; }
+.tech-deco { color: var(--accent-yellow); opacity: 0.9; }
+
+/* subtle underline accent for names */
+.glitch-hover { position: relative; display: inline-block; }
+.glitch-hover::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -3px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent-yellow), transparent);
+  opacity: 0.6;
+}
+
+@media (max-width: 520px) {
+  .team-ops-card .team-grid { grid-template-columns: 1fr; }
+}
+
+
+/* Operator cards expandable details */
+.operator-card { cursor: pointer; }
+
+.operator-card .op-more {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  margin-top: 0;
+  transition: max-height 0.35s ease, opacity 0.25s ease, margin-top 0.25s ease, transform 0.25s ease;
+  transform: translateY(-4px);
+  border-top: 1px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.operator-card.expanded .op-more {
+  max-height: 320px; /* large enough to reveal content */
+  opacity: 1;
+  margin-top: 0.75rem;
+  transform: translateY(0);
+  border-top-color: var(--glass-border);
+}
+
+.operator-card.expanded {
+  border-color: rgba(240,219,79,0.45);
+  box-shadow: 0 10px 36px rgba(0,0,0,0.45), 0 0 0 1px rgba(240,219,79,0.12) inset;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .operator-card .op-more { transition: none; }
+}
+
+
+/* --- Team compact lists --- */
+.team-list {
+  list-style: none;
+  margin: 0.25rem 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.6rem 1rem;
+}
+
+.team-item .title {
+  font-size: 0.95rem;
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.team-item small {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-top: 0.15rem;
+}
+
+@media (min-width: 700px) {
+  .team-list { grid-template-columns: 1fr 1fr; }
+}
+
+@media (min-width: 1024px) {
+  .team-list { grid-template-columns: 1fr 1fr 1fr; }
+}
