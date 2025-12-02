@@ -140,7 +140,10 @@ html {
 
 /* Header / Hero */
 header {
-    height: 100vh;
+    /* changed: use min-height + top padding so fixed navbar doesn't overlap hero content */
+    min-height: calc(100vh - 80px);
+    height: auto; /* allow content to flow on small screens */
+    padding: 2.5rem 0; /* give breathing room above/below */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -149,6 +152,26 @@ header {
     background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
     position: relative;
     overflow: hidden;
+}
+
+/* ensure hero content doesn't get cramped */
+.hero-content {
+    position: relative;
+    z-index: 2;
+    padding: 0 1rem;
+    width: 100%;
+    max-width: 960px;
+    box-sizing: border-box;
+}
+
+/* make the logo scale more gracefully */
+.logo {
+    width: 360px;
+    max-width: 78vw; /* slightly smaller cap for very narrow screens */
+    height: auto;
+    margin: 0 auto 1rem;
+    display: block;
+    filter: drop-shadow(0 0 12px rgba(240, 219, 79, 0.15));
 }
 
 header::before {
@@ -163,11 +186,6 @@ header::before {
     pointer-events: none;
 }
 
-.hero-content {
-    position: relative;
-    z-index: 2;
-}
-
 .subtitle {
     font-family: var(--font-code);
     color: var(--accent-cyan);
@@ -177,14 +195,59 @@ header::before {
 }
 
 .partners {
-    margin-top: 2rem;
+    margin: 2rem auto;                 /* center the block horizontally */
     color: var(--text-secondary);
     font-size: 0.9rem;
-    max-width: 600px;
+    max-width: min(640px, 90%);        /* sensible cap + responsive shrink */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.18rem;
+    text-align: center;
+    padding: 0 0.5rem;
+    box-sizing: border-box;
 }
 
-.partners strong {
+/* Each logical line is a centered block so nothing latches to the left */
+.partners .partner-line {
+    margin: 0.08rem auto;
+    line-height: 1.15;
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+
+/* Stronged institution lines should be their own centered block and wrap cleanly */
+.partners .partner-line strong {
+    display: block;
+    margin: 0.05rem auto;
     color: var(--text-primary);
+    font-weight: 700;
+    white-space: normal; /* allow wrapping */
+}
+
+/* Explicit separator class — keeps visual parity and centers perfectly */
+.partners .partner-sep {
+    margin: 0.18rem auto;
+    font-size: 1.15rem;
+    color: var(--accent-yellow);
+    line-height: 1;
+    text-align: center;
+}
+
+/* Small-screen tweaks */
+@media (max-width: 520px) {
+    .partners {
+        max-width: 94%;
+        gap: 0.12rem;
+        font-size: 0.86rem;
+    }
+    .partners .partner-sep { font-size: 1.02rem; margin: 0.12rem auto; }
+    .partners .partner-line strong {
+        font-size: 0.98rem;
+        line-height: 1.08;
+    }
 }
 
 /* Info Cards */
@@ -322,11 +385,53 @@ header::before {
 }
 
 /* Responsive */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
     .glitch { font-size: 3rem; }
     .nav-links { display: none; } /* Simple hide for mobile, ideally add hamburger */
     .navbar { justify-content: center; }
-    .nav-logo { margin: 0 auto; }
+
+    /* reduce fixed navbar height to save vertical space on small devices */
+    .navbar { height: 64px; }
+    .nav-logo-img { height: 52px; }
+
+    /* important: compensate scroll-padding for smaller navbar */
+    html { scroll-padding-top: 64px; }
+
+    /* hero adjustments */
+    header {
+        min-height: calc(100vh - 64px);
+        padding-top: calc(64px + 0.75rem); /* ensure content sits below navbar */
+        padding-bottom: 2rem;
+        justify-content: center;
+    }
+    .logo { width: min(60vw, 320px); max-width: 78vw; }
+    .subtitle { font-size: 1rem; }
+    .partners { max-width: 90%; padding: 0 0.5rem; font-size: 0.9rem; margin-top: 1.25rem; }
+    .btn { padding: 0.8rem 2rem; font-size: 1rem; margin-top: 1.5rem; }
+    .hero-hint { font-size: 0.95rem; }
+}
+
+/* tighter rules for very small screens */
+@media (max-width: 520px) {
+    .team-ops-card .team-grid { grid-template-columns: 1fr; }
+
+    header {
+        /* ensure hero fits and allows some top offset for the fixed nav */
+        min-height: calc(100vh - 64px);
+        padding-top: calc(64px + 0.5rem);
+        padding-bottom: 1.5rem;
+        align-items: flex-start;
+    }
+    .hero-content { padding-top: 0.6rem; }
+    .logo { width: min(72vw, 260px); margin-bottom: 0.5rem; }
+    .subtitle { font-size: 0.9rem; letter-spacing: 1px; }
+    .partners { margin-top: 0.8rem; font-size: 0.82rem; }
+    .btn { padding: 0.6rem 1rem; font-size: 0.95rem; margin-top: 1rem; }
+
+    /* small screen nav/logo tweaks */
+    .navbar { height: 56px; }
+    .nav-logo-img { height: 44px; }
+    html { scroll-padding-top: 56px; }
 }
 
 /* Binary canvas layer */
